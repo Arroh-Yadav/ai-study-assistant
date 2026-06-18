@@ -5,15 +5,20 @@ import google.generativeai as genai
 
 load_dotenv()
 
-# Configure Gemini
 api_key = os.getenv('GOOGLE_API_KEY')
 if not api_key:
-    print("⚠️  WARNING: GOOGLE_API_KEY not found in environment variables!")
+    print("⚠️ WARNING: GOOGLE_API_KEY not found!")
 
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-flash')
 
 app = Flask(__name__)
+
+# Default generation config
+def get_model(max_tokens=800):
+    return genai.GenerativeModel(
+        'gemini-3.5-flash',
+        system_instruction="You are a friendly, encouraging, and highly knowledgeable AI Study Assistant. Help students with their studies. Be clear, educational, and motivating."
+    )
 
 @app.route('/')
 def home():
@@ -24,25 +29,34 @@ def chat():
     try:
         data = request.get_json()
         user_message = data.get('message', '').strip()
-        
+        max_tokens = int(data.get('max_tokens', 800))
+
         if not user_message:
             return jsonify({'error': 'No message provided'}), 400
 
-        prompt = f"""You are a friendly, encouraging, and highly knowledgeable AI Study Assistant.
-        Help students with studies. Be clear, educational, and motivating.
-        
-        User: {user_message}
-        
-        Respond helpfully and naturally."""
+        model = get_model(max_tokens)
 
-        response = model.generate_content(prompt)
-        return jsonify({'response': response.text})
+        response = model.generate_content(
+            user_message,
+            generation_config={
+                "max_output_tokens": max_tokens,
+                "temperature": 0.7,
+                "top_p": 0.95,
+            }
+        )
+
+        return jsonify({
+            'response': response.text,
+            'tokens_used': getattr(response, 'usage_metadata', None)  # For future debugging
+        })
     
     except Exception as e:
         error_msg = str(e)
-        if "API key" in error_msg.lower():
-            error_msg = "Missing or invalid Gemini API key. Please check your .env file."
+        print("Error:", error_msg)
+        
+        if "429" in error_msg or "quota" in error_msg.lower():
+            error_msg = "⏳ Quota limit reached. Please wait a minute."
         return jsonify({'error': error_msg}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=False)
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=False) 
