@@ -1,1 +1,3 @@
-[content of requirements.txt]
+google-genai
+streamlit
+python-dotenv
