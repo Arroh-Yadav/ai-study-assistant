@@ -1,19 +1,17 @@
 # AI Study Assistant
 
-A simple AI-powered study assistant built with Google Gemini API.
+An AI-powered study assistant built with Google Gemini API.
 
 ## Features
-- Interactive chat for explaining concepts
-- Quiz generation
-- Study plan suggestions
-- Summarization of notes
+- Interactive chat for study help
+- Summarize notes
+- Generate quizzes
+- Explain concepts
 
 ## Setup
-1. Get your Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Clone this repo: `git clone https://github.com/Arroh-Yadav/ai-study-assistant.git`
-3. Install dependencies: `pip install -r requirements.txt`
-4. Set environment variable: `export GEMINI_API_KEY=your_key_here`
-5. Run: `streamlit run app.py`
+1. Get Gemini API key from https://aistudio.google.com/apikey
+2. Create `.env` file with `GOOGLE_API_KEY=your_key`
+3. pip install -r requirements.txt
+4. python app.py
 
-## Usage
-Run the Streamlit app for a web interface.
+You must create the API key yourself as I cannot access your Google account.
