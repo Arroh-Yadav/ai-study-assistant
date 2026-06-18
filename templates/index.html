@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Study Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chat { height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .message { margin: 10px 0; }
+        .user { text-align: right; color: blue; }
+        .ai { text-align: left; color: green; }
+    </style>
+</head>
+<body>
+    <h1>AI Study Assistant (Gemini)</h1>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Ask anything about studies..." style="width: 70%;">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        function sendMessage() {
+            const msg = document.getElementById('message').value;
+            if (!msg) return;
+            addMessage('user', msg);
+            fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg})
+            })
+            .then(r => r.json())
+            .then(data => {
+                addMessage('ai', data.response || data.error);
+            });
+            document.getElementById('message').value = '';
+        }
+        function addMessage(sender, text) {
+            const chat = document.getElementById('chat');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.textContent = text;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>
